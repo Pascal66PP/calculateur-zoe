@@ -4,12 +4,14 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Calculateur de Temps de Recharge - Zoé</title>
+
   <style>
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
       padding: 20px;
     }
+
     .container {
       max-width: 400px;
       margin: auto;
@@ -18,10 +20,12 @@
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+
     label {
       display: block;
       margin: 10px 0 5px;
     }
+
     input, select {
       width: 100%;
       padding: 8px;
@@ -29,6 +33,7 @@
       border-radius: 5px;
       border: 1px solid #ccc;
     }
+
     button {
       width: 100%;
       padding: 10px;
@@ -38,85 +43,116 @@
       border-radius: 5px;
       cursor: pointer;
     }
+
     button:hover {
       background: #0056b3;
     }
+
     .result {
       margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      background-color: #e9f7ef;
+      border: 1px solid #b7e4c7;
       font-weight: bold;
     }
+
+    .temps {
+      color: #28a745;
+      font-size: 20px;
+    }
+
+    .fin {
+      margin-top: 5px;
+      color: #155724;
+    }
+
     .image {
       text-align: center;
       margin-bottom: 20px;
     }
+
     .image img {
       max-width: 100%;
       border-radius: 8px;
     }
+
   </style>
 </head>
+
 <body>
-  <div class="container">
-    <div class="image">
-      <img src="https://www.dropbox.com/scl/fi/0a0k4psd0a6d413g0u41z/Zoe-Blanche.webp?rlkey=4w08as7abo9h62rsgbdx8n2xq&st=dm42auj5&raw=1" alt="Renault Zoé blanche" />
-    </div>
 
-    <h2>Recharge Zoé - Batterie 52 kWh</h2>
+<div class="container">
 
-    <label for="battery">Pourcentage de batterie restante (%) :</label>
-    <input type="number" id="battery" min="0" max="100" value="20" />
-
-    <label for="target">Objectif de recharge (%) :</label>
-    <select id="target">
-      <option value="100">100%</option>
-      <option value="80" selected>80%</option>
-    </select>
-
-    <label for="power">Mode de recharge :</label>
-    <select id="power">
-      <option value="22">Recharge 22 kWh</option>
-      <option value="7">Recharge Max 7 kWh</option>
-      <option value="4">Recharge ECO 4 kWh</option>
-      <option value="2.8">Recharge Solaire 2,8 kWh</option>
-    </select>
-
-    <button onclick="calculerRecharge()">Calculer le temps de recharge</button>
-
-    <div class="result" id="result"></div>
+  <div class="image">
+    <img src="https://www.dropbox.com/scl/fi/0a0k4psd0a6d413g0u41z/Zoe-Blanche.webp?rlkey=4w08as7abo9h62rsgbdx8n2xq&st=dm42auj5&raw=1" alt="Renault Zoé" />
   </div>
 
-  <script>
-    function calculerRecharge() {
-      const batterieRestante = parseFloat(document.getElementById('battery').value);
-      const puissanceBorne = parseFloat(document.getElementById('power').value);
-      const objectif = parseFloat(document.getElementById('target').value);
+  <h2>Recharge Zoé - Batterie 52 kWh</h2>
 
-      const modeTexte = document.getElementById('power').options[
-        document.getElementById('power').selectedIndex
-      ].text;
+  <label>Pourcentage actuel (%) :</label>
+  <input type="number" id="battery" min="0" max="100" value="20" />
 
-      if (
-        isNaN(batterieRestante) ||
-        batterieRestante < 0 ||
-        batterieRestante > 100 ||
-        batterieRestante >= objectif
-      ) {
-        document.getElementById('result').innerText =
-          "Veuillez entrer un pourcentage valide (inférieur à l'objectif).";
-        return;
-      }
+  <label>Objectif (%) :</label>
+  <select id="target">
+    <option value="100">100%</option>
+    <option value="80" selected>80%</option>
+  </select>
 
-      const capaciteTotale = 52; // kWh
-      const energieRequise = capaciteTotale * ((objectif - batterieRestante) / 100);
+  <label>Mode de recharge :</label>
+  <select id="power">
+    <option value="22">Recharge 22 kW</option>
+    <option value="7">Recharge Max 7 kW</option>
+    <option value="4">Recharge ECO 4 kW</option>
+    <option value="2.8">Recharge Solaire 2,8 kW</option>
+  </select>
 
-      const tempsHeures = energieRequise / puissanceBorne;
+  <button onclick="calculerRecharge()">Calculer</button>
 
-      const heures = Math.floor(tempsHeures);
-      const minutes = Math.round((tempsHeures - heures) * 60);
+  <div class="result" id="result"></div>
 
-      document.getElementById('result').innerText =
-        `Mode : ${modeTexte}\nTemps estimé : ${heures}h ${minutes}min pour atteindre ${objectif}%`;
-    }
-  </script>
+</div>
+
+<script>
+function calculerRecharge() {
+
+  const batterie = parseFloat(document.getElementById('battery').value);
+  const objectif = parseFloat(document.getElementById('target').value);
+  const puissance = parseFloat(document.getElementById('power').value);
+
+  const modeTexte = document.getElementById('power').options[
+    document.getElementById('power').selectedIndex
+  ].text;
+
+  if (isNaN(batterie) || batterie < 0 || batterie > 100 || batterie >= objectif) {
+    document.getElementById('result').innerHTML =
+      "⚠️ Valeur invalide (doit être inférieure à l'objectif)";
+    return;
+  }
+
+  const capacite = 52;
+  const energie = capacite * ((objectif - batterie) / 100);
+
+  const temps = energie / puissance;
+
+  const h = Math.floor(temps);
+  const m = Math.round((temps - h) * 60);
+
+  // 🔥 Heure de fin
+  const now = new Date();
+  now.setHours(now.getHours() + h);
+  now.setMinutes(now.getMinutes() + m);
+
+  const heureFin = now.getHours().toString().padStart(2, '0');
+  const minuteFin = now.getMinutes().toString().padStart(2, '0');
+
+  document.getElementById('result').innerHTML = `
+    Mode : ${modeTexte}<br>
+    Temps estimé : <span class="temps">${h}h ${m}min</span><br>
+    <div class="fin">Charge terminée à ${heureFin}h${minuteFin}</div>
+  `;
+}
+</script>
+
 </body>
 </html>
